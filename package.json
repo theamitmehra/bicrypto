@@ -18,7 +18,7 @@
     "start:backend": "node dist/index.js --env production",
     "start:backend:thread": "node dist/thread.js --env production",
     "stop": "pm2 stop production.config.js --env production",
-    "build": "next build && pnpm run build:backend",
+    "build": "next build && npm run build:backend",
     "build:backend": "tsc -p tsconfig.json --noEmit false",
     "build:all": "pnpm run build",
     "seed": "sequelize-cli db:seed:all --config config.js",
