@@ -33,11 +33,11 @@ In Railway:
 
 Add Railway MySQL service (or use external MySQL), then set backend variables:
 
-- `DB_HOST`
-- `DB_PORT`
-- `DB_NAME`
-- `DB_USER`
-- `DB_PASSWORD`
+- `DB_HOST=${{MySQL.MYSQLHOST}}`
+- `DB_PORT=${{MySQL.MYSQLPORT}}`
+- `DB_NAME=${{MySQL.MYSQLDATABASE}}`
+- `DB_USER=${{MySQL.MYSQLUSER}}`
+- `DB_PASSWORD=${{MySQL.MYSQLPASSWORD}}`
 
 ## 4) Required env vars
 
