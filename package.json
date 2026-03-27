@@ -21,7 +21,7 @@
     "stop": "pm2 stop production.config.js --env production",
     "build": "next build",
     "build:full": "next build && npm run build:backend",
-    "build:backend": "tsc -p tsconfig.json --noEmit false",
+    "build:backend": "tsc -p tsconfig.backend.json --noEmit false",
     "build:all": "pnpm run build",
     "seed": "sequelize-cli db:seed:all --config config.js",
     "updator": "pnpm stop && pnpm update && pnpm seed && pnpm build:all && pnpm start",

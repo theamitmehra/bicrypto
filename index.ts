@@ -6,7 +6,7 @@ import "./module-alias-setup";
 import { MashServer } from "@b/index";
 import logger from "@b/utils/logger";
 
-const port = process.env.NEXT_PUBLIC_BACKEND_PORT || 4000;
+const port = process.env.PORT || process.env.NEXT_PUBLIC_BACKEND_PORT || 4000;
 
 const startApp = async () => {
   try {

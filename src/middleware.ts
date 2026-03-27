@@ -7,9 +7,23 @@ const AUTH_PAGES = ["/login", "/register", "/forgot", "/reset"];
 
 const tokenSecret = process.env.APP_ACCESS_TOKEN_SECRET;
 const dev = process.env.NODE_ENV !== "production";
-const frontendPort = process.env.NEXT_PUBLIC_FRONTEND_PORT || 3000;
 const backendPort = process.env.NEXT_PUBLIC_BACKEND_PORT || 4000;
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+const backendHostPort = process.env.BACKEND_HOSTPORT;
+const backendUrlFromEnv =
+  process.env.BACKEND_URL ||
+  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  (backendHostPort ? `http://${backendHostPort}` : "");
+const railwayPublicDomain = process.env.RAILWAY_PUBLIC_DOMAIN;
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (railwayPublicDomain ? `https://${railwayPublicDomain}` : "");
+const normalizedSiteUrl = siteUrl ? siteUrl.replace(/\/$/, "") : "";
+const normalizedBackendUrl = backendUrlFromEnv
+  ? backendUrlFromEnv.replace(/\/$/, "")
+  : "";
+const resolvedApiBaseUrl =
+  normalizedBackendUrl ||
+  (dev ? `http://localhost:${backendPort}` : normalizedSiteUrl);
 const isFrontendEnabled = process.env.NEXT_PUBLIC_FRONTEND === "true";
 const defaultUserPath = process.env.NEXT_PUBLIC_DEFAULT_USER_PATH || "/user";
 const isMaintenance =
@@ -19,8 +33,10 @@ if (!tokenSecret) {
   throw new Error("APP_ACCESS_TOKEN_SECRET is not set");
 }
 
-if (!dev && !siteUrl) {
-  throw new Error("NEXT_PUBLIC_SITE_URL is not set");
+if (!resolvedApiBaseUrl) {
+  throw new Error(
+    "API base URL is not configured. Set BACKEND_URL or NEXT_PUBLIC_SITE_URL."
+  );
 }
 
 interface Role {
@@ -36,12 +52,7 @@ let rolesCache: RolesCache | null = null;
 
 async function fetchRolesAndPermissions(request: NextRequest) {
   try {
-    // In development, query backend directly to avoid middleware self-fetch loops
-    // on the frontend dev server (3000/3001).
-    const resolvedSiteUrl = dev
-      ? `http://localhost:${backendPort}`
-      : (siteUrl as string);
-    const apiUrl = `${resolvedSiteUrl}/api/auth/role`;
+    const apiUrl = `${resolvedApiBaseUrl}/api/auth/role`;
 
     const headers: Record<string, string> = {
       Accept: "application/json",
@@ -140,10 +151,7 @@ async function verifyToken(
 
 async function refreshToken(request: NextRequest) {
   try {
-    const resolvedSiteUrl = dev
-      ? `http://localhost:${backendPort}`
-      : (siteUrl as string);
-    const response = await fetch(`${resolvedSiteUrl}/api/auth/session`, {
+    const response = await fetch(`${resolvedApiBaseUrl}/api/auth/session`, {
       method: "GET",
       credentials: "include",
       headers: {
